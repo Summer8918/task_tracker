@@ -1,9 +1,10 @@
-package task_test
+package test
+
 import (
 	"encoding/json"
 	"testing"
 	"fmt"
-    "github.com/Summer8918/task_tracker/utils"
+	utils "github.com/Summer8918/task_tracker/utils"
 )
 
 func TestTask_JSONRoundTrip(t *testing.T) {
