@@ -14,6 +14,7 @@ func NewRootCmd() *cobra.Command {
 		`,
 	}
 	cmd.AddCommand(NewAddCmd())
+	cmd.AddCommand(NewListCmd())
 	return cmd;
 }
 
@@ -39,3 +40,29 @@ func RunAddTaskCmd(args []string) error {
 	return AddTask(description)
 }
 
+func NewListCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "list",
+		Short: "List all tasks",
+		Long: `List all tasks. You can filter tasks by status
+    			Example:
+    			task_tracker list todo
+    			task_tracker list in_progress
+    			task_tracker list done
+				task_tracker list blocked
+    	`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return RunListTaskCmd(args)
+		},
+	}
+	return cmd
+}
+
+func RunListTaskCmd(args []string) error {
+	if len(args) > 0 {
+		status := TaskStatus(args[0])
+		return ListTasks(status)
+	}
+
+	return ListTasks("all")
+}
