@@ -186,3 +186,28 @@ func UpdateTaskDescription(id int64, description string) error {
 	fmt.Printf("\nTask updated successfully: %s\n\n", formattedId)
 	return WriteTasksToFile(tasks)
 }
+
+func DeleteTask(id int64) error {
+	tasks, err := ReadTasksFromFile()
+	if err != nil {
+		return err
+	}
+
+	var updatedTasks []Task
+	for _, task := range tasks {
+		if task.ID != id {
+			updatedTasks = append(updatedTasks, task)
+		}
+	}
+
+	if len(updatedTasks) == len(tasks) {
+		return fmt.Errorf("task not found (ID: %d)", id)
+	}
+
+	formattedId := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color("#FFCC66")).
+		Render(fmt.Sprintf("(ID: %d)", id))
+	fmt.Printf("\nTask deleted successfully: %s\n\n", formattedId)
+	return WriteTasksToFile(updatedTasks)
+}
