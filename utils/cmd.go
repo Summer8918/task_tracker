@@ -3,6 +3,8 @@ package utils
 import (
 	"github.com/spf13/cobra"
 	"errors"
+	"strconv"
+	"fmt"
 )
 
 func NewRootCmd() *cobra.Command {
@@ -15,6 +17,7 @@ func NewRootCmd() *cobra.Command {
 	}
 	cmd.AddCommand(NewAddCmd())
 	cmd.AddCommand(NewListCmd())
+	cmd.AddCommand(NewUpdateCmd())
 	return cmd;
 }
 
@@ -65,4 +68,35 @@ func RunListTaskCmd(args []string) error {
 	}
 
 	return ListTasks("all")
+}
+
+func NewUpdateCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update",
+		Short: "Update a task",
+		Long: `Update a task by providing the task ID and the new status
+    Example:
+    task_tracker update 1 'new description'
+    `,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return RunUpdateTaskCmd(args)
+		},
+	}
+
+	return cmd
+}
+
+func RunUpdateTaskCmd(args []string) error {
+	if len(args) != 2 {
+		return fmt.Errorf("Please provide a task id and the new description")
+	}
+
+	taskID := args[0]
+	taskIDInt, err := strconv.ParseInt(taskID, 10, 32)
+	if err != nil {
+		return err
+	}
+
+	newDescription := args[1]
+	return UpdateTaskDescription(taskIDInt, newDescription)
 }

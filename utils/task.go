@@ -158,3 +158,31 @@ func ListTasks(status TaskStatus) error {
 
 	return nil
 }
+
+func UpdateTaskDescription(id int64, description string) error {
+	tasks, err := ReadTasksFromFile()
+	if err != nil {
+		return err
+	}
+
+	var taskExists bool = false
+    for i := range tasks { // iterate by index to modify in place
+		if tasks[i].ID == id {
+			tasks[i].Description = description
+			tasks[i].UpdatedAt = time.Now()
+			taskExists = true
+			break
+		}
+	}
+
+	if !taskExists {
+		return fmt.Errorf("task not found (ID: %d)", id)
+	}
+
+	formattedId := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color("#FFCC66")).
+		Render(fmt.Sprintf("(ID: %d)", id))
+	fmt.Printf("\nTask updated successfully: %s\n\n", formattedId)
+	return WriteTasksToFile(tasks)
+}
