@@ -20,6 +20,9 @@ func NewRootCmd() *cobra.Command {
 	cmd.AddCommand(NewUpdateCmd())
 	cmd.AddCommand(NewDeleteCmd())
 	cmd.AddCommand(NewMarkStatusDoneCmd())
+	cmd.AddCommand(NewMarkStatusInProgressCmd())
+	cmd.AddCommand(NewMarkStatusTodoCmd())
+	cmd.AddCommand(NewMarkStatusBlockedCmd())
 	return cmd;
 }
 
@@ -156,4 +159,37 @@ func RunUpdateStatusCmd(args []string, status TaskStatus) error {
 	}
 
 	return UpdateTaskStatus(id, status)
+}
+
+func NewMarkStatusInProgressCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "mark-in-progress",
+		Short: "Mark a task as in-progress",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return RunUpdateStatusCmd(args, StatusInProcess)
+		},
+	}
+	return cmd
+}
+
+func NewMarkStatusTodoCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "mark-todo",
+		Short: "Mark a task as todo",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return RunUpdateStatusCmd(args, StatusTodo)
+		},
+	}
+	return cmd
+}
+
+func NewMarkStatusBlockedCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "mark-blocked",
+		Short: "Mark a task as blocked",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return RunUpdateStatusCmd(args, StatusBlocked)
+		},
+	}
+	return cmd
 }
