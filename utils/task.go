@@ -13,7 +13,7 @@ type TaskStatus string
 // Define the only values you allow
 const (
     StatusTodo    TaskStatus = "todo"
-    StatusInpProcess   TaskStatus = "in_progress"
+    StatusInProcess   TaskStatus = "in_progress"
     StatusDone    TaskStatus = "done"
     StatusBlocked TaskStatus = "blocked"
 )
@@ -30,7 +30,7 @@ func statusColor(status TaskStatus) string {
 	switch status {
 	case StatusTodo:
 		return "#3C3C3C"
-	case StatusInpProcess:
+	case StatusInProcess:
 		return "202"
 	case StatusDone:
 		return "#04B575"
@@ -106,7 +106,7 @@ func ListTasks(status TaskStatus) error {
             }
         }
 
-    case StatusInpProcess:
+    case StatusInProcess:
         for _, task := range tasks {
             if task.Status == StatusTodo {
                 filteredTasks = append(filteredTasks, task)
@@ -209,5 +209,44 @@ func DeleteTask(id int64) error {
 		Foreground(lipgloss.Color("#FFCC66")).
 		Render(fmt.Sprintf("(ID: %d)", id))
 	fmt.Printf("\nTask deleted successfully: %s\n\n", formattedId)
+	return WriteTasksToFile(updatedTasks)
+}
+
+func UpdateTaskStatus(id int64, status TaskStatus) error {
+	tasks, err := ReadTasksFromFile()
+	if err != nil {
+		return err
+	}
+
+	var taskExists bool = false
+	var updatedTasks []Task
+	for _, task := range tasks {
+		if task.ID == id {
+			taskExists = true
+			switch status {
+			case StatusTodo:
+				task.Status = StatusTodo
+			case StatusInProcess:
+				task.Status = StatusInProcess
+			case StatusDone:
+				task.Status = StatusDone
+            case StatusBlocked:
+                task.Status = StatusBlocked
+			}
+			task.UpdatedAt = time.Now()
+		}
+
+		updatedTasks = append(updatedTasks, task)
+	}
+
+	if !taskExists {
+		return fmt.Errorf("task not found (ID: %d)", id)
+	}
+
+	formattedId := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color("#FFCC66")).
+		Render(fmt.Sprintf("(ID: %d)", id))
+	fmt.Printf("\nTask updated successfully: %s\n\n", formattedId)
 	return WriteTasksToFile(updatedTasks)
 }

@@ -19,6 +19,7 @@ func NewRootCmd() *cobra.Command {
 	cmd.AddCommand(NewListCmd())
 	cmd.AddCommand(NewUpdateCmd())
 	cmd.AddCommand(NewDeleteCmd())
+	cmd.AddCommand(NewMarkStatusDoneCmd())
 	return cmd;
 }
 
@@ -131,4 +132,28 @@ func RunDeleteTaskCmd(args []string) error {
 	}
 
 	return DeleteTask(taskIDInt)
+}
+
+func NewMarkStatusDoneCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "mark-done",
+		Short: "Mark a task as done",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return RunUpdateStatusCmd(args, StatusDone)
+		},
+	}
+	return cmd
+}
+
+func RunUpdateStatusCmd(args []string, status TaskStatus) error {
+	if len(args) == 0 {
+		return fmt.Errorf("task ID is required")
+	}
+
+	id, err := strconv.ParseInt(args[0], 10, 64)
+	if err != nil {
+		return err
+	}
+
+	return UpdateTaskStatus(id, status)
 }
